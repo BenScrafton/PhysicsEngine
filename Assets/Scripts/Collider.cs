@@ -4,21 +4,22 @@ using UnityEngine;
 
 public class Collider : MonoBehaviour
 {
-    //public virtual CollisionPoints BoxCollision() 
-    //{
-    //    CollisionPoints c = new CollisionPoints(); 
-    //    return c;
-    //}
+    public virtual Collision TestCollision(Collider collider) 
+    {
+        return null;
+    }
 
-    //public virtual CollisionPoints SphereCollision()
-    //{
-    //    CollisionPoints c = new CollisionPoints();
-    //    return c;
-    //}
-    //public virtual CollisionPoints PlaneCollision()
-    //{
-    //    CollisionPoints c = new CollisionPoints();
-    //    return c;
-    //}
+    public virtual Collision TestCollision(BoxCollider box)
+    {
+        return null;
+    }
 
+    public virtual Collision TestCollision(SphereCollider sphereCollider)
+    {
+        return null;
+    }
+    public virtual Collision TestCollision(PlaneCollider planeCollider)
+    {
+        return null;
+    }
 }

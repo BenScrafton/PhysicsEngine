@@ -8,11 +8,13 @@ public class Object : MonoBehaviour
     public Vector3 velocity;
     public Vector3 force;
 
+    public bool isStatic = false;
+
     //Collider
 
     private void Start()
     {
-        AddForce(new Vector3(0, 1000, 0));
+        //AddForce(new Vector3(0, 1000, 0));
     }
 
     void AddForce(Vector3 f) 

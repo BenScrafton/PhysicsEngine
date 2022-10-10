@@ -12,20 +12,24 @@ public class PlaneCollider : Collider
         size = p_size;
     }
 
-    //public override CollisionPoints BoxCollision()
-    //{
-    //    CollisionPoints c = new CollisionPoints();
-    //    return c;
-    //}
+    public override Collision TestCollision(Collider collider) 
+    {
+        return collider.TestCollision(this);
+    }
 
-    //public override CollisionPoints SphereCollision()
-    //{
-    //    CollisionPoints c = new CollisionPoints();
-    //    return c;
-    //}
-    //public override CollisionPoints PlaneCollision()
-    //{
-    //    CollisionPoints c = new CollisionPoints();
-    //    return c;
-    //}
+    public override Collision TestCollision(BoxCollider box)
+    {
+        return null;
+    }
+
+    public override Collision TestCollision(SphereCollider sphereCollider)
+    {
+        print("Plane: sphere to plane");
+
+        return CollisionCalculator.CalcSphereToPlaneCollision(sphereCollider, this);
+    }
+    public override Collision TestCollision(PlaneCollider planeCollider)
+    {
+        return null;
+    }
 }

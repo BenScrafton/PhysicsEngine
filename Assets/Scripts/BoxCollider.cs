@@ -13,19 +13,22 @@ public class BoxCollider : Collider
         size = p_size;
     }
 
-    //public override CollisionPoints BoxCollision()
-    //{
-    //    CollisionPoints c = new CollisionPoints();
-    //    return c;
-    //}
-    //public override CollisionPoints SphereCollision()
-    //{
-    //    CollisionPoints c = new CollisionPoints();
-    //    return c;
-    //}
-    //public override CollisionPoints PlaneCollision()
-    //{
-    //    CollisionPoints c = new CollisionPoints();
-    //    return c;
-    //}
+    public override Collision TestCollision(Collider collider) 
+    {
+        return collider.TestCollision(this);
+    }
+
+    public override Collision TestCollision(BoxCollider box)
+    {
+        return null;
+    }
+
+    public override Collision TestCollision(SphereCollider sphereCollider)
+    {
+        return null;
+    }
+    public override Collision TestCollision(PlaneCollider planeCollider)
+    {
+        return null;
+    }
 }
