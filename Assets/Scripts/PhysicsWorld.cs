@@ -12,7 +12,6 @@ public class PhysicsWorld : MonoBehaviour
     void Start()
     {
         m_objects = new List<Object>(FindObjectsOfType<Object>());
-
     }
 
     private void FixedUpdate()
@@ -45,18 +44,24 @@ public class PhysicsWorld : MonoBehaviour
             return;
         }
 
-        if (collision.objectA.isStatic) 
-        {
-            print("collideA");
-            collision.objectB.transform.position += collision.nextMove;
-            collision.objectB.velocity = Vector3.zero;
-        }
-        else if (collision.objectB.isStatic) 
-        {
-            print("collideB");
-            collision.objectA.transform.position += collision.nextMove;
-            collision.objectA.velocity = Vector3.zero;
-        }
+        //if (collision.objectA.isStatic) 
+        //{
+        //    print("collideA");
+        //    collision.objectB.transform.position += collision.nextMove;
+        //    collision.objectB.velocity = Vector3.zero;
+        //}
+        //else if (collision.objectB.isStatic) 
+        //{
+        //    print("collideB");
+        //    collision.objectA.transform.position += collision.nextMove;
+        //    collision.objectA.velocity = Vector3.zero;
+        //}
+
+        collision.objectA.transform.position += collision.nextMoveA;
+        collision.objectA.velocity = Vector3.zero;
+
+        collision.objectB.transform.position += collision.nextMoveB;
+        collision.objectB.velocity = Vector3.zero;
     }
 
     void ResolveCollisions() 
@@ -76,7 +81,6 @@ public class PhysicsWorld : MonoBehaviour
                         {
                             m_collisions.Add(collision);
                         }
-
                     }
                 }
             }
@@ -95,7 +99,7 @@ public class PhysicsWorld : MonoBehaviour
             if (!obj.isStatic) 
             {
                 // v = u + at so...
-                // v = u + (f/m)*fixedTimeStep
+                // v = u + (f/m) * fixedTimeStep
 
                 Vector3 resultantForce = obj.force + (m_gravity * obj.mass);
 
