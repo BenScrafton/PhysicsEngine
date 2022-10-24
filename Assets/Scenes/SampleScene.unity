@@ -156,9 +156,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mass: 10
-  velocity: {x: 0, y: 0, z: 0}
+  velocity: {x: 20, y: -1, z: 0}
   force: {x: 0, y: 0, z: 0}
-  isStatic: 1
+  isStatic: 0
 --- !u!23 &247962514
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -505,7 +505,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mass: 10
-  velocity: {x: -3, y: -1, z: 0}
+  velocity: {x: -10, y: 0, z: 0}
   force: {x: 0, y: 0, z: 0}
   isStatic: 0
 --- !u!23 &1102390632

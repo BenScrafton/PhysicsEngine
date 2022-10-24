@@ -66,30 +66,31 @@ public class PhysicsWorld : MonoBehaviour
 
     void ResolveCollisions() 
     {
-        print("num objects: " + m_objects.Count);
-
         foreach (Object a in m_objects)
         {
-            foreach (Object b in m_objects) 
+            foreach (Object b in m_objects)
             {
                 if (a != b) // Check to make sure they are not the same
                 {
                     if (a.TryGetComponent(out Collider a_collider) && b.TryGetComponent(out Collider b_collider)) // Check to see if both have colliders 
                     {
                         Collision collision = a.GetComponent<Collider>().TestCollision(b.GetComponent<Collider>());
-                        if (collision.collided) 
+                        if (collision.collided)
                         {
                             m_collisions.Add(collision);
+                            SolveCollision(collision);
                         }
                     }
                 }
             }
         }
 
-        foreach(Collision collision in m_collisions) 
-        {
-            SolveCollision(collision);
-        }
+        //foreach(Collision collision in m_collisions) 
+        //{
+        //    UnityEngine.Debug.Log("solve1");
+
+        //    SolveCollision(collision);
+        //}
     }
 
     void UpdateObjectsPositions() 
