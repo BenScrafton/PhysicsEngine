@@ -58,10 +58,12 @@ public class PhysicsWorld : MonoBehaviour
         //}
 
         collision.objectA.transform.position += collision.nextMoveA;
-        collision.objectA.velocity = Vector3.zero;
+        //collision.objectA.velocity = Vector3.zero;
 
         collision.objectB.transform.position += collision.nextMoveB;
-        collision.objectB.velocity = Vector3.zero;
+        //collision.objectB.velocity = Vector3.zero;
+
+        ReactionSolver.Solve(collision);
     }
 
     void ResolveCollisions() 
