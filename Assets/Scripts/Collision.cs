@@ -13,7 +13,6 @@ public class Collision : MonoBehaviour
     public enum CollisionType
     {
         SPHERE_TO_PLANE,
-        SPHERE_TO_STATIONARY_SPHERE,
         SPHERE_TO_SPHERE,
         NONE
     }

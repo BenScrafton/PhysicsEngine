@@ -21,4 +21,9 @@ public class Object : MonoBehaviour
     {
         force = f;
     }
+
+    private void Update()
+    {
+        //print("velocity: " + this.name + " : "  + velocity);
+    }
 }

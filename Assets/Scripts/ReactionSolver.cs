@@ -31,58 +31,65 @@ public static class ReactionSolver
     {
         UnityEngine.Debug.Log("REACT");
 
-        if (collision.collisionType == Collision.CollisionType.SPHERE_TO_STATIONARY_SPHERE)
+        if (collision.collisionType == Collision.CollisionType.SPHERE_TO_SPHERE)
         {
             UnityEngine.Debug.Log("SPHERE REACT SOLVE");
 
-            SphereToStationarySphere(collision);
+            SphereToSphere(collision);
         }
         else
         {
-            collision.objectA.velocity = Vector3.zero;
-            collision.objectB.velocity = Vector3.zero;
+            //collision.objectA.velocity = Vector3.zero;
+            //collision.objectB.velocity = Vector3.zero;
         }
     }
 
-    public static void SphereToStationarySphere(Collision collision)
+    public static void SphereToSphere(Collision collision)
     {
-        Object a;
-        Object b;
 
-        if (collision.objectA.isStatic)
+        UnityEngine.Debug.Log("SPHERE REACT SOLVE2");
+        Object objA = collision.objectA;
+        Object objB = collision.objectB;  
+
+        objA.isStatic = false;
+        objB.isStatic = false;
+
+        // A on B
+        Vector3 momA1 = Vector3.zero;
+        Vector3 momB1 = Vector3.zero;
+
+        if (objA.velocity != Vector3.zero) 
         {
-            a = collision.objectB;
-            b = collision.objectA;
+            Vector3 totalMom1 = objA.velocity * objA.mass;
+            Vector3 collisionNormal = NormalizeVector(objB.transform.position - objA.transform.position);
+            float angleQ = AngleBetweenVectors(collisionNormal, objA.velocity);
 
-            b.isStatic = false;
+            momB1 = Mathf.Cos(angleQ) * SizeOfVector(totalMom1) * collisionNormal;
+            momA1 = totalMom1 - momB1;
         }
-        else if (collision.objectB.isStatic)
+
+        // B on A
+        Vector3 momA2 = Vector3.zero;
+        Vector3 momB2 = Vector3.zero;
+
+        if (objB.velocity != Vector3.zero) 
         {
-            a = collision.objectA;
-            b = collision.objectB;
+            Vector3 totalMom2 = objB.velocity * objB.mass;
+            Vector3 collisionNormal2 = NormalizeVector(objA.transform.position - objB.transform.position);
+            float angleR = AngleBetweenVectors(collisionNormal2, objB.velocity);
 
-            b.isStatic = false;
-        }
-        else 
-        {
-            return;
+            momA2 = Mathf.Cos(angleR) * SizeOfVector(totalMom2) * collisionNormal2;
+            momB2 = totalMom2 - momA2;
         }
 
-        Vector3 v2 = NormalizeVector(b.transform.position - a.transform.position);
-        Vector3 v1 = NormalizeVector(v2 * -1);
+        UnityEngine.Debug.Log("momA1: " + momA1 + " : momA2: " + momA2);
+        UnityEngine.Debug.Log("momB1: " + momB1 + " : momB2: " + momB2);
 
-        float totalMomentumMagnitude = a.mass * SizeOfVector(a.velocity);
-        Vector3 momentumA;
-        Vector3 momentumB;
+        //objA.velocity = (momA1) / objA.mass;
+        //objB.velocity = (momB1) / objB.mass;
 
-        momentumB = totalMomentumMagnitude * Mathf.Cos(AngleBetweenVectors(a.transform.position, v2)) * v2;
-        momentumA = (totalMomentumMagnitude - SizeOfVector(momentumB)) * v1;
+        //objA.velocity = momA1 / objA.mass;
+        //objB.velocity = momB1 / objB.mass;
 
-        UnityEngine.Debug.Log("MOMB: " + momentumB + " MOMA:" + momentumA);
-
-        a.velocity = momentumA / a.mass;
-        b.velocity = momentumB / b.mass;
-
-        UnityEngine.Debug.Log("A: " + a.velocity + " B:" + b.velocity);
     }
 }

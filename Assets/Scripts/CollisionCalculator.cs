@@ -34,6 +34,8 @@ public static class CollisionCalculator
         if ((sphereCollider.GetComponent<Object>().velocity == Vector3.zero) ||
            (AngleBetweenVectors(sphereCollider.GetComponent<Object>().velocity, planeCollider.normal) == (90 * Mathf.PI / 180)))
         {
+            UnityEngine.Debug.Log("new Collision");
+
             return new Collision(Collision.CollisionType.SPHERE_TO_PLANE, false, sphereCollider.GetComponent<Object>(), planeCollider.GetComponent<Object>(), Vector3.zero, Vector3.zero);
         }
 
@@ -72,6 +74,7 @@ public static class CollisionCalculator
 
         UnityEngine.Debug.Log("next move A: " + nextMoveA);
 
+        UnityEngine.Debug.Log("new CollisionB");
         return new Collision(Collision.CollisionType.SPHERE_TO_PLANE, collided, sphereCollider.GetComponent<Object>(), planeCollider.GetComponent<Object>(), nextMoveA, nextMoveB);
     }
 
@@ -95,12 +98,12 @@ public static class CollisionCalculator
         else if (!a.GetComponent<Object>().isStatic && b.GetComponent<Object>().isStatic)
         {
             nextMoveA = CalcSphereToStationarySphereCollision(a, b);
-            type = Collision.CollisionType.SPHERE_TO_STATIONARY_SPHERE;
+            type = Collision.CollisionType.SPHERE_TO_SPHERE;
         }
         else if (a.GetComponent<Object>().isStatic && !b.GetComponent<Object>().isStatic)
         {
             nextMoveB = CalcSphereToStationarySphereCollision(b, a);
-            type = Collision.CollisionType.SPHERE_TO_STATIONARY_SPHERE;
+            type = Collision.CollisionType.SPHERE_TO_SPHERE;
         }
         else //both static
         {
@@ -112,6 +115,10 @@ public static class CollisionCalculator
         {
             collided = true;
         }
+
+
+        UnityEngine.Debug.Log("new CollisionC");
+
 
         return new Collision(type, collided, a.GetComponent<Object>(), b.GetComponent<Object>(), nextMoveA, nextMoveB);
     }
@@ -126,7 +133,7 @@ public static class CollisionCalculator
         float nextMoveDistance = Mathf.Cos(angleQ) * SizeOfVector(A) - e;
         Vector3 nextMove = (V / SizeOfVector(V)) * nextMoveDistance;
 
-        if (nextMoveDistance < SizeOfVector(a.GetComponent<Object>().velocity * Time.fixedDeltaTime))
+        if (Mathf.Abs(nextMoveDistance) < Mathf.Abs(SizeOfVector(a.GetComponent<Object>().velocity * Time.fixedDeltaTime)))
         {
             return nextMove;
         }
@@ -160,6 +167,7 @@ public static class CollisionCalculator
         {
             //no collision
             UnityEngine.Debug.Log("EXIT_1");
+            UnityEngine.Debug.Log("new CollisionD");
             return new Collision(Collision.CollisionType.NONE, false, a.GetComponent<Object>(), b.GetComponent<Object>(), Vector3.zero, Vector3.zero);
         }
 
@@ -167,6 +175,14 @@ public static class CollisionCalculator
         float t2 = (-B - Mathf.Sqrt((B * B) - (4 * A * C))) / (2 * A);
 
         float t;
+
+
+        if ((2 * A) == 0)
+        {
+            UnityEngine.Debug.Log("new CollisionE");
+            return new Collision(Collision.CollisionType.NONE, false, a.GetComponent<Object>(), b.GetComponent<Object>(), Vector3.zero, Vector3.zero);
+        }
+
 
         if (t1 < t2)
         {
@@ -191,27 +207,25 @@ public static class CollisionCalculator
             }
         }
 
-        UnityEngine.Debug.Log("T1: " + t1);
-        UnityEngine.Debug.Log("T2: " + t2);
+
+
 
         if (t == -1)
         {
             //no collision
             UnityEngine.Debug.Log("EXIT_2");
+            UnityEngine.Debug.Log("new CollisionF");
             return new Collision(Collision.CollisionType.NONE, false, a.GetComponent<Object>(), b.GetComponent<Object>(), Vector3.zero, Vector3.zero);
         }
+
+
+        UnityEngine.Debug.Log("T1: " + t1);
+        UnityEngine.Debug.Log("T2: " + t2);
 
         Vector3 nextMoveA = (t * a.GetComponent<Object>().velocity);
         Vector3 nextMoveB = (t * b.GetComponent<Object>().velocity);
 
-        UnityEngine.Debug.Log("next move a: " + nextMoveA);
-        UnityEngine.Debug.Log("next move b: " + nextMoveB);
-        UnityEngine.Debug.Log("t: " + t);
-        UnityEngine.Debug.Log("a velocity: " + a.GetComponent<Object>().velocity + " : " + a.name);
-        UnityEngine.Debug.Log("b velocity: " + b.GetComponent<Object>().velocity + " : " + b.name);
-
-        UnityEngine.Debug.Log("SPHERE TO SPHERE COLLIDE");
-
+        UnityEngine.Debug.Log("new CollisionG");
         return new Collision(Collision.CollisionType.SPHERE_TO_SPHERE, true, a.GetComponent<Object>(), b.GetComponent<Object>(), nextMoveA, nextMoveB);
     }
 
