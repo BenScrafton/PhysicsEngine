@@ -34,7 +34,7 @@ public static class CollisionCalculator
         if ((sphereCollider.GetComponent<Object>().velocity == Vector3.zero) ||
            (AngleBetweenVectors(sphereCollider.GetComponent<Object>().velocity, planeCollider.normal) == (90 * Mathf.PI / 180)))
         {
-            return new Collision(false, sphereCollider.GetComponent<Object>(), planeCollider.GetComponent<Object>(), Vector3.zero, Vector3.zero);
+            return new Collision(CollisionType.SPHERE_TO_PLANE, false, sphereCollider.GetComponent<Object>(), planeCollider.GetComponent<Object>(), Vector3.zero, Vector3.zero);
         }
 
         Vector3 planeCenterOfMass = planeCollider.transform.position;
@@ -47,9 +47,6 @@ public static class CollisionCalculator
 
         float s = AngleBetweenVectors((planeCollider.normal * -1), sphereCollider.GetComponent<Object>().velocity);
 
-        UnityEngine.Debug.Log("normal: " + (planeCollider.normal * -1));
-        UnityEngine.Debug.Log("sphere velocity: " + sphereCollider.GetComponent<Object>().velocity);
-        UnityEngine.Debug.Log("s: " + s);
 
         float nextMoveDistance = (d - sphereCollider.radius) / Mathf.Cos(s);
 
@@ -61,7 +58,7 @@ public static class CollisionCalculator
 
 
 
-        if (nextMoveDistance < SizeOfVector(sphereCollider.GetComponent<Object>().velocity * Time.fixedDeltaTime))
+        if (Mathf.Abs(nextMoveDistance) < Mathf.Abs(SizeOfVector(sphereCollider.GetComponent<Object>().velocity * Time.fixedDeltaTime)))
         {
             nextMoveA = NormalizeVector(sphereCollider.GetComponent<Object>().velocity) * nextMoveDistance;
             collided = true;
@@ -71,9 +68,7 @@ public static class CollisionCalculator
             nextMoveA = Vector3.zero;
         }
 
-        UnityEngine.Debug.Log("next move A: " + nextMoveA);
-
-        return new Collision(collided, sphereCollider.GetComponent<Object>(), planeCollider.GetComponent<Object>(), nextMoveA, nextMoveB);
+        return new Collision(CollisionType.SPHERE_TO_PLANE, collided, sphereCollider.GetComponent<Object>(), planeCollider.GetComponent<Object>(), nextMoveA, nextMoveB);
     }
 
     public static Collision CalcSphereToSphereCollision(SphereCollider a, SphereCollider b)
@@ -87,7 +82,6 @@ public static class CollisionCalculator
             Collision c = CalculateSphereToMovingSphereCollision(a, b);
             nextMoveA = c.nextMoveA;
             nextMoveB = c.nextMoveB;
-            UnityEngine.Debug.Log("nextMoveA: " + nextMoveA);
         }
         else if (!a.GetComponent<Object>().isStatic && b.GetComponent<Object>().isStatic)
         {
@@ -107,7 +101,7 @@ public static class CollisionCalculator
             collided = true;
         }
 
-        return new Collision(collided, a.GetComponent<Object>(), b.GetComponent<Object>(), nextMoveA, nextMoveB);
+        return new Collision(CollisionType.SPHERE_TO_SPHERE, collided, a.GetComponent<Object>(), b.GetComponent<Object>(), nextMoveA, nextMoveB);
     }
 
     static Vector3 CalcSphereToStationarySphereCollision(SphereCollider a, SphereCollider b)
@@ -120,7 +114,7 @@ public static class CollisionCalculator
         float nextMoveDistance = Mathf.Cos(angleQ) * SizeOfVector(A) - e;
         Vector3 nextMove = (V / SizeOfVector(V)) * nextMoveDistance;
 
-        if (nextMoveDistance < SizeOfVector(a.GetComponent<Object>().velocity * Time.fixedDeltaTime))
+        if (Mathf.Abs(nextMoveDistance) < Mathf.Abs(SizeOfVector(a.GetComponent<Object>().velocity * Time.fixedDeltaTime)))
         {
             return nextMove;
         }
@@ -141,8 +135,8 @@ public static class CollisionCalculator
         float diffZpos = aPos.z - bPos.z;
 
         float diffXvelocity = aVelocity.x - bVelocity.x;
-        float diffYvelocity = bVelocity.y - aVelocity.y;
-        float diffZvelocity = bVelocity.z - aVelocity.z;
+        float diffYvelocity = aVelocity.y - bVelocity.y;
+        float diffZvelocity = aVelocity.z - bVelocity.z;
 
         //Quadratic equation solve
         float A = (diffXvelocity * diffXvelocity) + (diffYvelocity * diffYvelocity) + (diffZvelocity * diffZvelocity);
@@ -153,8 +147,7 @@ public static class CollisionCalculator
         if ((B * B) < (4 * A * C))
         {
             //no collision
-            UnityEngine.Debug.Log("EXIT_1");
-            return new Collision(false, a.GetComponent<Object>(), b.GetComponent<Object>(), Vector3.zero, Vector3.zero);
+            return new Collision(CollisionType.SPHERE_TO_SPHERE, false, a.GetComponent<Object>(), b.GetComponent<Object>(), Vector3.zero, Vector3.zero);
         }
 
         float t1 = (-B + Mathf.Sqrt((B * B) - (4 * A * C))) / (2 * A);
@@ -185,45 +178,16 @@ public static class CollisionCalculator
             }
         }
 
-        UnityEngine.Debug.Log("T1: " + t1);
-        UnityEngine.Debug.Log("T2: " + t2);
-
         if (t == -1)
         {
             //no collision
-            UnityEngine.Debug.Log("EXIT_2");
-            return new Collision(false, a.GetComponent<Object>(), b.GetComponent<Object>(), Vector3.zero, Vector3.zero);
+            return new Collision(CollisionType.SPHERE_TO_SPHERE, false, a.GetComponent<Object>(), b.GetComponent<Object>(), Vector3.zero, Vector3.zero);
         }
 
         Vector3 nextMoveA = (t * a.GetComponent<Object>().velocity);
         Vector3 nextMoveB = (t * b.GetComponent<Object>().velocity);
 
-        UnityEngine.Debug.Log("next move a: " + nextMoveA);
-        UnityEngine.Debug.Log("next move b: " + nextMoveB);
-        UnityEngine.Debug.Log("t: " + t);
-        UnityEngine.Debug.Log("a velocity: " + a.GetComponent<Object>().velocity + " : " + a.name);
-        UnityEngine.Debug.Log("b velocity: " + b.GetComponent<Object>().velocity + " : " + b.name);
 
-        UnityEngine.Debug.Log("SPHERE TO SPHERE COLLIDE");
-
-        return new Collision(true, a.GetComponent<Object>(), b.GetComponent<Object>(), nextMoveA, nextMoveB);
+        return new Collision(CollisionType.SPHERE_TO_SPHERE, true, a.GetComponent<Object>(), b.GetComponent<Object>(), nextMoveA, nextMoveB);
     }
-
-    //public static CollisionPoints CalcSphereToBoxCollisionPoints()
-    //{
-    //    CollisionPoints c = new CollisionPoints();
-    //    return c;
-    //}
-
-    //public static CollisionPoints CalcPlaneToBoxCollisionPoints()
-    //{
-    //    CollisionPoints c = new CollisionPoints();
-    //    return c;
-    //}
-
-    //public static CollisionPoints CalcBoxToBoxCollisionPoints()
-    //{
-    //    CollisionPoints c = new CollisionPoints();
-    //    return c;
-    //}
 }
