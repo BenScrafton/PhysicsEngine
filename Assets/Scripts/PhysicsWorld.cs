@@ -70,6 +70,11 @@ public class PhysicsWorld : MonoBehaviour
     {
         foreach (Object a in m_objects)
         {
+            if (a.isStatic) 
+            {
+                continue;
+            }
+
             foreach (Object b in m_objects)
             {
                 if (a != b) // Check to make sure they are not the same
@@ -98,7 +103,7 @@ public class PhysicsWorld : MonoBehaviour
     {
         foreach (Object obj in m_objects)
         {
-            if (!obj.isStatic) 
+            if (!obj.isStatic && obj.velocity != Vector3.zero) 
             {
                 // v = u + at so...
                 // v = u + (f/m) * fixedTimeStep

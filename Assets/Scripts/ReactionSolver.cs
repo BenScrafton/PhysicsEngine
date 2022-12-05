@@ -36,8 +36,9 @@ public class ReactionSolver : MonoBehaviour
         }
         else if(collision.collisionType == CollisionType.SPHERE_TO_PLANE)
         {
-            collision.objectA.velocity = Vector3.zero;
-            collision.objectB.velocity = Vector3.zero;
+            //collision.objectA.velocity = Vector3.zero;
+            //collision.objectB.velocity = Vector3.zero;
+            SphereToPlane(collision);
         }
     }
 
@@ -82,6 +83,24 @@ public class ReactionSolver : MonoBehaviour
 
         //objA.velocity = momA1 / objA.mass;
         //objB.velocity = momB1 / objB.mass;
+    }
+
+    public static void SphereToPlane(Collision collision) 
+    {
+        Object sphere = collision.objectA;
+        Object plane = collision.objectB;
+
+        Vector3 normal = plane.GetComponent<PlaneCollider>().normal;
+        float vMagnitude = SizeOfVector(sphere.velocity);
+
+        Vector3 vBeforeUnit = sphere.velocity / vMagnitude;
+        Vector3 vAfterUnit = (2 * normal * DotProduct(normal, vBeforeUnit * -1)) + vBeforeUnit;
+        Vector3 vAfter = vAfterUnit * vMagnitude;
+
+        sphere.velocity = vAfter;
+        //sphere.transform.position += vAfter;
+
+        Debug.Log("vAfter: " + vAfter);
     }
 }
 
