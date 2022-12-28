@@ -9,16 +9,16 @@ public class FluidSimulator : MonoBehaviour
 
     List<Particle> particles = new List<Particle>(); //Change to spatial hashing later
 
+    Vector3 gravity = new Vector3(0, -9.81f, 0);
 
     [Header("Generic Values")]
     [SerializeField] float interactionRadius;
-
+    
     [Space]
 
     [Header("Elasticity Values")]
     [SerializeField] float springConstant;
     [SerializeField] float springRestLength;
-
 
     [Space]
 
@@ -34,8 +34,21 @@ public class FluidSimulator : MonoBehaviour
     [SerializeField] float nearInteractionRadius;
     [SerializeField] float nearPressureConstant;
 
+    [Space]
+
+    [Header("Viscosity Values")]
+    [SerializeField] float linearImpulseControl;
+    [SerializeField] float quadraticImpulseControl;
+
+    [Space]
+
+    [Header("Stickyness")]
+    [SerializeField] float slipFactor;
+    [SerializeField] float stickDistance;
+    [SerializeField] float stickinessConstant;
 
     List<Spring> springs = new List<Spring>();
+
 
     // Start is called before the first frame update
     void Start()
@@ -43,6 +56,9 @@ public class FluidSimulator : MonoBehaviour
         foreach(Particle particle in FindObjectsOfType<Particle>()) 
         {
             particles.Add(particle);
+            particle.slipFactor = slipFactor;
+            particle.stickDistance = stickDistance;
+            particle.stickinessConstant = stickinessConstant;
         }
     }
 
@@ -50,14 +66,32 @@ public class FluidSimulator : MonoBehaviour
     {
         //SIMULATION STEPS:
 
-        //ApplyGravity();
-        //ApplyViscosity();
+        ApplyGravity();
+        ApplyViscosity();
+        SetStartPositions();
         //AdvanceToPredictedPos();
         AdjustSprings();
         ApplySpringDisplacements();
         DoubleDenistyRelaxation();
         //ResolveCollisions();
         CalculateNextVelocities();
+    }
+
+    void SetStartPositions() 
+    {
+        foreach(Particle p in particles) 
+        {
+            p.previousPos = new Vector3(p.transform.position.x, p.transform.position.y, p.transform.position.z);
+            p.transform.position += p.velocity * Time.deltaTime;
+        }
+    }
+
+    void ApplyGravity() 
+    {
+        foreach(Particle p in particles) 
+        {
+           p.velocity += Time.fixedDeltaTime * gravity;
+        }
     }
 
     void AdjustSprings()
@@ -127,6 +161,33 @@ public class FluidSimulator : MonoBehaviour
 
                 spring.CleanUp();
                 spring = null;
+            }
+        }
+    }
+
+    void ApplyViscosity() 
+    {
+        foreach(Spring spring in springs) 
+        {
+            float scaleFactor = Vector3.Distance(spring.particleA.transform.position, 
+                                       spring.particleB.transform.position) / interactionRadius;
+            
+            if(scaleFactor < 1) 
+            {
+                Vector3 dir = spring.particleB.transform.position - spring.particleA.transform.position;
+                Vector3.Normalize(dir);
+                float inwardRadialVelocity = Vector3.Dot((spring.particleA.velocity - spring.particleB.velocity), dir);
+
+                if(inwardRadialVelocity > 0) 
+                {
+                    Vector3 impulse = Time.fixedDeltaTime * (1 - scaleFactor) * 
+                                      (linearImpulseControl * inwardRadialVelocity + quadraticImpulseControl * inwardRadialVelocity * inwardRadialVelocity) *
+                                       dir;
+
+                    //Apply impuse in equal and opposite directions
+                    spring.particleA.velocity -= impulse / 2;
+                    spring.particleB.velocity += impulse / 2;
+                }
             }
         }
     }
@@ -249,6 +310,9 @@ public class FluidSimulator : MonoBehaviour
 
     void CalculateNextVelocities() 
     {
-
+        foreach(Particle p in particles) 
+        {
+            p.velocity = ((p.transform.position - p.previousPos) / Time.fixedDeltaTime) + p.GetComponent<Rigidbody>().velocity;
+        }
     }
 }
