@@ -2,12 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpatialHashingGrid : MonoBehaviour
+public class SpatialHashingGrid
 {
     int resolution;
     List<Particle> particles;
 
-    SpatialHashingGrid(int p_resolution, List<Particle> p_particles) 
+    public SpatialHashingGrid(int p_resolution, List<Particle> p_particles) 
     {
         resolution = p_resolution;
         particles = p_particles;
@@ -20,13 +20,13 @@ public class SpatialHashingGrid : MonoBehaviour
         public int z;
     }
 
-    Dictionary<Key, List<Particle>> grid;
+    Dictionary<Key, List<Particle>> grid = new Dictionary<Key, List<Particle>>();
 
-    private void FixedUpdate()
+    public void Update()
     {
         RemoveParticles();
-        
-        foreach(Particle p in particles) 
+
+        foreach (Particle p in particles) 
         {
             AddParticle(p);
         }
@@ -82,8 +82,10 @@ public class SpatialHashingGrid : MonoBehaviour
         return particlesRef;
     }
 
-    List<Particle> GetNeighbors(Vector3 position, int cellSearchSpan) 
+    public List<Particle> GetNeighbors(Vector3 position, int cellSearchSpan,float interactionDistance) 
     {
+        //CHECK FOR PARTICLES BEING THE SAME
+
         List<Particle> particlesRef = new List<Particle>();
 
         Key key = CalculateKey(position);
@@ -95,13 +97,24 @@ public class SpatialHashingGrid : MonoBehaviour
                 for (int x = -cellSearchSpan; x < cellSearchSpan; x++)
                 {
                     Key newKey;
+
                     newKey.x = key.x + x;
                     newKey.y = key.y + y;
                     newKey.z = key.z + z;
 
                     if (grid.ContainsKey(newKey)) 
                     {
-                        particlesRef.AddRange(GetParticlesAtCell(newKey));
+                        float dist = Vector3.Distance(position, new Vector3(newKey.x, newKey.y, newKey.z));
+
+                        if (dist < interactionDistance)
+                        {
+                            particlesRef.AddRange(GetParticlesAtCell(newKey));
+                        }
+
+                        //if (particlesRef.Count > 4)
+                        //{
+                        //    return particlesRef;
+                        //}
                     }
                 }
             }

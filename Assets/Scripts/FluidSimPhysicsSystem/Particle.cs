@@ -11,9 +11,23 @@ public class Particle : MonoBehaviour
     public float density;
     public float nearDensity;
 
+
+
     public float slipFactor;
     public float stickDistance;
     public float stickinessConstant;
+
+
+    Vector3 normal;
+    Vector3 relativeNormal;
+    Vector3 relativeTangent;
+    Vector3 impulse;
+    Vector3 contactPoint;
+    Vector3 otherColliderVelocity;
+
+    float distanceFromCollisionSurface;
+    ContactPoint cp;
+    float distance;
 
     // Start is called before the first frame update
     void Start()
@@ -27,28 +41,40 @@ public class Particle : MonoBehaviour
         
     }
 
+    private void FixedUpdate()
+    {
+
+    }
+
     private void OnCollisionStay(UnityEngine.Collision collision)
     {
-        Vector3 otherColliderVelocity = Vector3.zero;//collision.collider.GetComponent<Rigidbody>().velocity;
-        Vector3 particleRelativeVelocity = velocity; //- otherColliderVelocity;
-
-        Vector3 normal = collision.GetContact(0).normal;
-
-        Vector3 relativeNormal = Vector3.Dot(particleRelativeVelocity, normal) * normal;
-        Vector3 relativeTangent = particleRelativeVelocity - relativeNormal;
-
-        Vector3 impulse = relativeNormal - (slipFactor * relativeTangent);
 
 
-        Vector3 contactPoint = collision.GetContact(0).point;
-        transform.position += (normal * (0.5f - Vector3.Distance(contactPoint, transform.position))) + (normal * 0.01f);
+        print("COLLIDE");
+
+        otherColliderVelocity = Vector3.zero;//collision.collider.GetComponent<Rigidbody>().velocity;
+                                             //    Vector3 particleRelativeVelocity = velocity; //- otherColliderVelocity;
+                                             //print("Collision " );
+
+        cp = collision.GetContact(0);
+
+        normal = cp.normal;
+
+        relativeNormal = Vector3.Dot(velocity, normal) * normal;
+        relativeTangent = velocity - relativeNormal;
+
+        impulse = relativeNormal - (slipFactor * relativeTangent);
+
+        distance = Vector3.Distance(cp.point, transform.position);
+
+        transform.position += (normal * (0.5f - distance)) + (normal * 0.01f);
 
         //Collision Impulse
         velocity -= impulse;
 
-        float distanceFromCollisionSurface = Vector3.Distance(contactPoint, transform.position);
-        Vector3 stickinessImpulse = -1 * Time.fixedDeltaTime * stickinessConstant * distanceFromCollisionSurface * (1 - (distanceFromCollisionSurface / stickDistance)) * normal;
+        distanceFromCollisionSurface = distance;
 
-        velocity += stickinessImpulse;
+        velocity += -1.0f * Time.fixedDeltaTime * stickinessConstant * distanceFromCollisionSurface * (1.0f - (distanceFromCollisionSurface / stickDistance)) * normal;
+
     }
 }

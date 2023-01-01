@@ -9,10 +9,13 @@ public class FluidSimulator : MonoBehaviour
 
     List<Particle> particles = new List<Particle>(); //Change to spatial hashing later
 
-    Vector3 gravity = new Vector3(0, -9.81f, 0);
+    Vector3 gravity = new Vector3(0, -9.0f, 0);
+
+    SpatialHashingGrid spatialHashingGrid;
 
     [Header("Generic Values")]
     [SerializeField] float interactionRadius;
+    [SerializeField] int maxConnections;
     
     [Space]
 
@@ -53,7 +56,9 @@ public class FluidSimulator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        foreach(Particle particle in FindObjectsOfType<Particle>()) 
+        spatialHashingGrid = new SpatialHashingGrid(1, particles);
+
+        foreach (Particle particle in FindObjectsOfType<Particle>()) 
         {
             particles.Add(particle);
             particle.slipFactor = slipFactor;
@@ -64,9 +69,13 @@ public class FluidSimulator : MonoBehaviour
 
     private void FixedUpdate()
     {
+        
+        spatialHashingGrid.Update();
+        
         //SIMULATION STEPS:
 
         ApplyGravity();
+        
         ApplyViscosity();
         SetStartPositions();
         //AdvanceToPredictedPos();
@@ -117,26 +126,41 @@ public class FluidSimulator : MonoBehaviour
 
     void AddSprings() 
     {
-        //Replace with Spatial Hashing later
         foreach (Particle a in particles)
         {
-            foreach (Particle b in particles)
+            if (a.particleConnections.Count >= maxConnections)
             {
-                if (a == b || a.particleConnections.Contains(b))
+                continue;
+            }
+
+            List<Particle> neighbors = spatialHashingGrid.GetNeighbors(a.transform.position, 1, interactionRadius);
+
+       //     print("Neighbors " + neighbors.Count);
+
+            foreach (Particle b in neighbors)
+            {
+                if (a == b) 
                 {
                     continue;
                 }
 
-                float dist = Vector3.Distance(a.transform.position, b.transform.position);
-                if (dist <= interactionRadius)
+                if (a.particleConnections.Contains(b))
+                {
+                    continue;
+                }
+
+     //           float dist = Vector3.Distance(a.transform.position, b.transform.position);
+
+      //          if (dist <= interactionRadius)
                 {
                     //Add a spring between particles
-                    LineRenderer lr = Instantiate(debugLine).GetComponent<LineRenderer>();
+                    //LineRenderer lr = Instantiate(debugLine).GetComponent<LineRenderer>();
 
                     Spring spring = new Spring(a, b, 
                                                springConstant, springRestLength, interactionRadius, 
-                                               plasticityConstant, yieldRatio, 
-                                               lr);
+                                               plasticityConstant, yieldRatio
+                                             //  lr
+                                               );
                     springs.Add(spring);
                 }
             }
@@ -312,7 +336,7 @@ public class FluidSimulator : MonoBehaviour
     {
         foreach(Particle p in particles) 
         {
-            p.velocity = ((p.transform.position - p.previousPos) / Time.fixedDeltaTime) + p.GetComponent<Rigidbody>().velocity;
+            p.velocity = ((p.transform.position - p.previousPos) / Time.fixedDeltaTime); //+ p.GetComponent<Rigidbody>().velocity;
         }
     }
 }

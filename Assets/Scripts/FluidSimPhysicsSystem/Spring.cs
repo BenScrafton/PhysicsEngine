@@ -22,7 +22,9 @@ public class Spring
 
     public Spring(Particle p_particleA, Particle p_particleB, 
                   float p_springConstant, float p_restLength, float p_maxNeighborDistance,
-                  float p_plasticityConstant, float p_yieldRatio, LineRenderer p_lineRenderer)
+                  float p_plasticityConstant, float p_yieldRatio
+        //          LineRenderer p_lineRenderer
+        )
     {
         //Initialize
 
@@ -42,15 +44,15 @@ public class Spring
         particleB.particleConnections.Add(particleA);
 
         //Debug-----------------------------------------------------------------------------
-        lineRenderer = p_lineRenderer;
+     //   lineRenderer = p_lineRenderer;
 
         // set the color of the line
-        lineRenderer.startColor = Color.blue;
-        lineRenderer.endColor = Color.blue;
+   //     lineRenderer.startColor = Color.blue;
+   //     lineRenderer.endColor = Color.blue;
 
         // set width of the renderer
-        lineRenderer.startWidth = 0.1f;
-        lineRenderer.endWidth = 0.1f;
+    //    lineRenderer.startWidth = 0.1f;
+   //     lineRenderer.endWidth = 0.1f;
     }
 
     public void ModifyRestLength() 
@@ -100,18 +102,18 @@ public class Spring
         particleB.transform.position += dispalcement / 2;
 
         //Debug
-        UpdateDebugLineRender();
+    //    UpdateDebugLineRender();
     }
 
     void UpdateDebugLineRender() 
     {
         // set the position
-        lineRenderer.SetPosition(0, particleA.transform.position);
-        lineRenderer.SetPosition(1, particleB.transform.position);
+        //lineRenderer.SetPosition(0, particleA.transform.position);
+        //lineRenderer.SetPosition(1, particleB.transform.position);
     }
 
     public void CleanUp() 
     {
-        GameObject.Destroy(lineRenderer.gameObject);
+    //    GameObject.Destroy(lineRenderer.gameObject);
     }
 }
