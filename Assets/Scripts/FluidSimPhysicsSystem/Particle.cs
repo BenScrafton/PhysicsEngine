@@ -48,14 +48,7 @@ public class Particle : MonoBehaviour
 
     private void OnCollisionStay(UnityEngine.Collision collision)
     {
-
-
-        print("COLLIDE");
-
-        otherColliderVelocity = Vector3.zero;//collision.collider.GetComponent<Rigidbody>().velocity;
-                                             //    Vector3 particleRelativeVelocity = velocity; //- otherColliderVelocity;
-                                             //print("Collision " );
-
+        otherColliderVelocity = Vector3.zero;
         cp = collision.GetContact(0);
 
         normal = cp.normal;
@@ -67,7 +60,7 @@ public class Particle : MonoBehaviour
 
         distance = Vector3.Distance(cp.point, transform.position);
 
-        transform.position += (normal * (0.5f - distance)) + (normal * 0.01f);
+        transform.position += (normal * (0.5f - distance)) + (normal * 0.02f);
 
         //Collision Impulse
         velocity -= impulse;

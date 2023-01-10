@@ -44,9 +44,7 @@ public static class CollisionCalculator
         float q2 = (90 * Mathf.PI / 180) - q1;
 
         float d = Mathf.Sin(q2) * SizeOfVector(p);  //the distance from the sphere to the plane parallel to the normal of the sphere
-
         float s = AngleBetweenVectors((planeCollider.normal * -1), sphereCollider.GetComponent<Object>().velocity);
-
 
         float nextMoveDistance = (d - sphereCollider.radius) / Mathf.Cos(s);
 
@@ -55,8 +53,6 @@ public static class CollisionCalculator
         bool collided = false;
 
         UnityEngine.Debug.Log("next move dist: " + nextMoveDistance);
-
-
 
         if (Mathf.Abs(nextMoveDistance) < Mathf.Abs(SizeOfVector(sphereCollider.GetComponent<Object>().velocity * Time.fixedDeltaTime)))
         {

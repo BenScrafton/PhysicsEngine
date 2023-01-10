@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
+using System.Linq;
 
 public class FluidSimulator : MonoBehaviour
 {
@@ -9,7 +11,9 @@ public class FluidSimulator : MonoBehaviour
 
     List<Particle> particles = new List<Particle>(); //Change to spatial hashing later
 
-    Vector3 gravity = new Vector3(0, -9.0f, 0);
+    public Vector3 gravity = new Vector3(0, -9.0f, 0);
+
+    Rigidbody[] rigidbodies;
 
     SpatialHashingGrid spatialHashingGrid;
 
@@ -65,6 +69,8 @@ public class FluidSimulator : MonoBehaviour
             particle.stickDistance = stickDistance;
             particle.stickinessConstant = stickinessConstant;
         }
+
+        rigidbodies = FindObjectsOfType<Rigidbody>();
     }
 
     private void FixedUpdate()
@@ -332,11 +338,74 @@ public class FluidSimulator : MonoBehaviour
         }
     }
 
+    void TestCollision() 
+    {
+        foreach(Rigidbody rb in rigidbodies) 
+        {
+            if(rb.SweepTestAll(Vector3.zero, 1.0f).Length != 0) 
+            {
+                print("collision");
+            }
+            
+        }
+    }
+
     void CalculateNextVelocities() 
     {
         foreach(Particle p in particles) 
         {
             p.velocity = ((p.transform.position - p.previousPos) / Time.fixedDeltaTime); //+ p.GetComponent<Rigidbody>().velocity;
+        }
+    }
+
+    public void LoadSimParameters(string readFromFilePath) 
+    {
+        List<string> lines = File.ReadAllLines(readFromFilePath).ToList();
+
+        print(lines[0]);
+
+        //Set Generic Values
+        interactionRadius = float.Parse(lines[0]);
+        maxConnections = int.Parse(lines[1]);
+
+        //Set Elasticity Values
+        springConstant = float.Parse(lines[2]);
+        springRestLength = float.Parse(lines[3]);
+
+        //Set Plasticity Values
+        plasticityConstant = float.Parse(lines[4]);
+        yieldRatio = float.Parse(lines[5]);
+
+        //Set Density & Pressure Values
+        restDensity = float.Parse(lines[6]);
+        pressureConstant = float.Parse(lines[7]);
+        nearInteractionRadius = float.Parse(lines[8]);
+        nearPressureConstant = float.Parse(lines[9]);
+
+        //Set Viscosity Values
+        linearImpulseControl = float.Parse(lines[10]);
+        quadraticImpulseControl = float.Parse(lines[11]);
+
+        //Set Stickyness
+        slipFactor = float.Parse(lines[12]);
+        stickDistance = float.Parse(lines[13]);
+        stickinessConstant = float.Parse(lines[14]);
+
+
+        foreach (Particle particle in particles)
+        {
+            particle.slipFactor = slipFactor;
+            particle.stickDistance = stickDistance;
+            particle.stickinessConstant = stickinessConstant;
+        }
+
+        foreach (Spring spring in springs) 
+        {
+            spring.maxNeighborDistance = interactionRadius;
+            spring.springConstant = springConstant;
+            spring.restLength = springRestLength;
+            spring.plasticityConstant = plasticityConstant;
+            spring.yieldRatio = yieldRatio;
         }
     }
 }
