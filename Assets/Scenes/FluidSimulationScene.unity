@@ -16966,20 +16966,20 @@ MonoBehaviour:
   debugLine: {fileID: 7410169956201004602, guid: 1540e11020b96084dbe2d4dc09658ad7, type: 3}
   gravity: {x: 0, y: -9, z: 0}
   interactionRadius: 2
-  maxConnections: 40
-  springConstant: 13
+  maxConnections: 100
+  springConstant: 10
   springRestLength: 2
-  plasticityConstant: 10
-  yieldRatio: 0.8
+  plasticityConstant: 2
+  yieldRatio: 0.1
   restDensity: 1
   pressureConstant: 1
   nearInteractionRadius: 1.5
   nearPressureConstant: 20
-  linearImpulseControl: 20
+  linearImpulseControl: 10
   quadraticImpulseControl: 0
   slipFactor: -0.05
   stickDistance: 2
-  stickinessConstant: 150
+  stickinessConstant: 100
 --- !u!4 &1361724100
 Transform:
   m_ObjectHideFlags: 0

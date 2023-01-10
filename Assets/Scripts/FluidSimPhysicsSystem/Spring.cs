@@ -76,7 +76,7 @@ public class Spring
         float dist = Vector3.Distance(particleA.transform.position, particleB.transform.position);
 
         //return true;
-        if (dist > maxNeighborDistance + 1)
+        if (restLength > maxNeighborDistance)
         {
             return false;
         }

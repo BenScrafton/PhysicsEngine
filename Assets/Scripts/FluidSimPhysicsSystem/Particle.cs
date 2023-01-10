@@ -11,12 +11,9 @@ public class Particle : MonoBehaviour
     public float density;
     public float nearDensity;
 
-
-
     public float slipFactor;
     public float stickDistance;
     public float stickinessConstant;
-
 
     Vector3 normal;
     Vector3 relativeNormal;

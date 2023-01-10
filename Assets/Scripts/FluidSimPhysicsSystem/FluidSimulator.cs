@@ -141,8 +141,6 @@ public class FluidSimulator : MonoBehaviour
 
             List<Particle> neighbors = spatialHashingGrid.GetNeighbors(a.transform.position, 1, interactionRadius);
 
-       //     print("Neighbors " + neighbors.Count);
-
             foreach (Particle b in neighbors)
             {
                 if (a == b) 
@@ -155,20 +153,12 @@ public class FluidSimulator : MonoBehaviour
                     continue;
                 }
 
-     //           float dist = Vector3.Distance(a.transform.position, b.transform.position);
-
-      //          if (dist <= interactionRadius)
-                {
-                    //Add a spring between particles
-                    //LineRenderer lr = Instantiate(debugLine).GetComponent<LineRenderer>();
-
-                    Spring spring = new Spring(a, b, 
-                                               springConstant, springRestLength, interactionRadius, 
-                                               plasticityConstant, yieldRatio
-                                             //  lr
-                                               );
-                    springs.Add(spring);
-                }
+                Spring spring = new Spring(a, b, 
+                                            springConstant, springRestLength, interactionRadius, 
+                                            plasticityConstant, yieldRatio
+                                            //  lr
+                                            );
+                springs.Add(spring);
             }
         }
     }
@@ -329,7 +319,7 @@ public class FluidSimulator : MonoBehaviour
                 float distBetweenParticles = Vector3.Distance(a.transform.position, b.transform.position);
                 float scaleFactor = (1 - distBetweenParticles / interactionRadius);
 
-                Vector3 displacement = deltaTimeSquared * (((pressure * scaleFactor)) + (nearPressure * scaleFactor * scaleFactor)) * dir;
+                Vector3 displacement = deltaTimeSquared * ((pressure * scaleFactor) + (nearPressure * scaleFactor * scaleFactor)) * dir;
 
                 //Apply equal and opposite displacement
                 a.transform.position -= displacement / 2;
@@ -346,7 +336,6 @@ public class FluidSimulator : MonoBehaviour
             {
                 print("collision");
             }
-            
         }
     }
 
