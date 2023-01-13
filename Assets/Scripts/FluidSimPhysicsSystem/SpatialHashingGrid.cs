@@ -110,11 +110,6 @@ public class SpatialHashingGrid
                         {
                             particlesRef.AddRange(GetParticlesAtCell(newKey));
                         }
-
-                        //if (particlesRef.Count > 4)
-                        //{
-                        //    return particlesRef;
-                        //}
                     }
                 }
             }

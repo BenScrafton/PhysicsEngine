@@ -10,6 +10,7 @@ public class PlaneCollider : Collider
     PlaneCollider(Vector2 p_size) 
     {
         size = p_size;
+        normal = gameObject.transform.up;
     }
 
     public override Collision TestCollision(Collider collider) 

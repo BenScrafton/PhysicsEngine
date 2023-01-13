@@ -45,7 +45,7 @@ public class Particle : MonoBehaviour
 
     private void OnCollisionStay(UnityEngine.Collision collision)
     {
-        otherColliderVelocity = Vector3.zero;
+        otherColliderVelocity = collision.collider.GetComponent<Rigidbody>().velocity;
         cp = collision.GetContact(0);
 
         normal = cp.normal;

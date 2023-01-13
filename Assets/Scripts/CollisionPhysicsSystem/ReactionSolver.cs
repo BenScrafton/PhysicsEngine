@@ -98,7 +98,7 @@ public class ReactionSolver : MonoBehaviour
         Vector3 vAfter = vAfterUnit * vMagnitude;
 
         sphere.velocity = vAfter;
-        //sphere.transform.position += vAfter;
+        sphere.transform.position += vAfterUnit * 0.01f;
 
         Debug.Log("vAfter: " + vAfter);
     }

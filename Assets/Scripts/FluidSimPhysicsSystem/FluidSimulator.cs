@@ -83,7 +83,7 @@ public class FluidSimulator : MonoBehaviour
         ApplyGravity();
         
         ApplyViscosity();
-        SetStartPositions();
+        AdvanceToPredictedPos();
         //AdvanceToPredictedPos();
         AdjustSprings();
         ApplySpringDisplacements();
@@ -92,7 +92,7 @@ public class FluidSimulator : MonoBehaviour
         CalculateNextVelocities();
     }
 
-    void SetStartPositions() 
+    void AdvanceToPredictedPos() 
     {
         foreach(Particle p in particles) 
         {
@@ -222,8 +222,8 @@ public class FluidSimulator : MonoBehaviour
 
     void DoubleDenistyRelaxation() 
     {
-        UpdateNearNeighbors();
-        CalculateDensities();
+        //UpdateNearNeighbors();
+        //CalculateDensities();
         DensityRexlaxation();
     }
 
@@ -278,23 +278,26 @@ public class FluidSimulator : MonoBehaviour
             //Calculate density value per particle
             float density = 0;
 
+            //Calculate near density value per particle
+            float nearDensity = 0;
+
             foreach (Particle b in a.particleConnections) //Loop through particle a's neighbors 
             {
                 float distBetweenParticles = Vector3.Distance(a.transform.position, b.transform.position);
                 float baseValue = (1 - (distBetweenParticles / interactionRadius));
 
                 density += baseValue * baseValue;
-            }
 
-            //Calculate near density value per particle
-            float nearDensity = 0;
+                if (distBetweenParticles <= nearInteractionRadius)
+                {
+                    nearDensity += baseValue * baseValue * baseValue;
+                }
+            }
 
             foreach(Particle b in a.nearParticleConnections) 
             {
                 float distBetweenParticles = Vector3.Distance(a.transform.position, b.transform.position);
                 float baseValue = (1 - (distBetweenParticles / interactionRadius));
-
-                nearDensity += baseValue * baseValue * baseValue;
             }
 
             //Apply density and near density values
@@ -309,8 +312,29 @@ public class FluidSimulator : MonoBehaviour
 
         foreach (Particle a in particles) 
         {
-            float pressure = pressureConstant * (a.density - restDensity);
-            float nearPressure = nearPressureConstant * a.nearDensity;
+            //Calculate density value per particle
+            float density = 0;
+
+            //Calculate near density value per particle
+            float nearDensity = 0;
+
+            foreach (Particle b in a.particleConnections) //Loop through particle a's neighbors 
+            {
+                float distBetweenParticles = Vector3.Distance(a.transform.position, b.transform.position);
+                float baseValue = (1 - (distBetweenParticles / interactionRadius));
+
+                density += baseValue * baseValue;
+
+                if (distBetweenParticles <= nearInteractionRadius)
+                {
+                    nearDensity += baseValue * baseValue * baseValue;
+                }
+            }
+
+            float pressure = pressureConstant * (density - restDensity);
+            float nearPressure = nearPressureConstant * nearDensity;
+
+            Vector3 displacementA = Vector3.zero;
 
             foreach (Particle b in a.particleConnections) 
             {
@@ -322,9 +346,11 @@ public class FluidSimulator : MonoBehaviour
                 Vector3 displacement = deltaTimeSquared * ((pressure * scaleFactor) + (nearPressure * scaleFactor * scaleFactor)) * dir;
 
                 //Apply equal and opposite displacement
-                a.transform.position -= displacement / 2;
                 b.transform.position += displacement / 2;
+                displacementA -= displacement / 2;
             }
+
+            a.transform.position += displacementA / 2;
         }
     }
 
